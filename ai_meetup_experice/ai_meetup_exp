@@ -1,0 +1,11 @@
+My experience on attending an AI Meetup :
+	I had a chance to go to a couple of AI meetups. But i will be summarizing my experience one of my AI MEETUP.
+	Topics Covered: Automatic speech translation from Hindi to Kannada by using OpenCV and Convolution Neural Networks.
+	The meetup covered more technical aspects of opencv and CNN's. The presentor explained us the techinques used in opencv for obtaining the data from scanned images. 
+	He was using some techinques to split the rows and columns in the image to get the individual words. Post obtaining the individual words he created the input_vector
+	and the output_vector. 
+	Post obtaining the vector he used CNN to create a prediction model with accepts a word in Kannada and predicts its equivalent word in Hindi.
+	
+	This was the content for the first half of AI meetup . The second half covered basic of Recurrent Neural Networks and discussed on ResNet Research Paper(especially
+	the concepts of upsampling and downasampling images). 
+	
