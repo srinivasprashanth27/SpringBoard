@@ -1,0 +1,51 @@
+ 
+Intersection over Union: Intersection area/Union Area 
+Non maximum supression: Initially filter all the model anchor box predictions having probability of object less than 0.6 
+						Post removing achor boxes having probability of object less than 0.6 , Pick the anchor box having maximum probability of object score and supress/remove all the boxes 
+						having IOU more than 0.6 or some threshold.
+						Next select the anchor box having probability of object score 2nd maximum value and do the same process as above. 
+						This is called Non maximum supression
+
+R-CNN(training process):Using R-CNN for pascal VOC dataset.
+		Step-1: Take a CNN model like alexnet or vggnet which is pretrained on the Imagenet Dataset. 
+		Step-2: Replace the last outer layer with 1000 class outputs with VOC dataset no of classes+1 (1 is for background object)=21 
+		Step-3: Using Selective search algorithm obtain region proposals for each of the image in the dataset.
+		Step-4: Region proposals are warped into size that is acceptable for Alexnet or VGG architecture.
+		Step-4: Regions proposals having IOU >=0.5  with the ground truth are called postive examples and rest are called negative examples.
+		Step-5: Using set of positve and negative examples(28 postive and 96 background) as intput to the  the CNN in Step 1. Training with SGD and with very less learning_rate.
+		Step-6: Apart from this CNN network training , Class wise binary classifiers are also trained using SVM algorithm, Positive examples are the ground truth boxes and negative
+				samples are region proposals having IOU less than 0.3 (Hard negative mining is applied here). SVM binary classifier is trained using these positive and negative samples.
+		Step-7: POst completion of both the trainings, The feature vector before output layer (4096 dimensions) from main CNN network is passed as input to this each binary classifier and 
+		the prediction is obtained. A bounding box regressor is also trained where postive examples are ground truth values and negative examples are the region proposals obtained from selective search.
+		This is the entire functioning of R-CNN
+		During the test time  or validation time:For each of the test image, region proposals around 2000 are obtained and 
+			 send through the CNN layer and feature vector (4096) dimensions is captured, these feature vector is send through all the binary SVM and the SVM having high confidence score 
+			is the prediction value.
+	Drawbacks of R-CNN: Not an end to end trainable architecture. 
+						Training of different modules separately
+						MOre test time validation.(because of nearly 2000 region proposals for every image).
+						
+Fast R-CNN:
+	The number of image proposals obtained from selective search is nearly 2000 image proposals which are very large, this is replaced in Fast-RCNN
+	Instead of getting image proposals from selective search and sending all of them to CNN layer independently, ROI pooling layer is introduced.
+	Given image input along with Region Proposal(from selective search) is made to pass through a CNN network once and a ROI pooling layer is used to create a create a grid(C*h*W) from input C*H*W of each region proposal.
+	More info on ROI poolin at : http://cs231n.stanford.edu/slides/2016/winter1516_lecture8.pdf search for ROI pooling.
+	This grid from ROI pooling is now made to pass through a Fully Connected Layer and output from FC layers is sent to both Classification and Regression output layers.
+	ROI pooling mainly helps in sending sending entire input image along with Region Proposals only once rather than sending it once for each of the Region proposal. This decreases the computation.
+	Similar process is applied during test time where region proposals are obtained and sent through the Faster-RCNN architecture. 
+Faster R-CNN:
+	RPN: 
+		This layer is a fully convolutional layer. RPN consists of 5 shearable convolution layer (ZF net) or 13 layered convolution network.
+		The feature map coming from the last convolution layers is taken and a sliding window of size n*n is made to pass over the feature map.
+		This n*n sliding window is mapped to a 256 or 512 dimensions feature vector with  Relu activation function.
+		This 256 dimensional feature vector is sent to regression layer and box-classification layer.
+		Each sliding window generates 9 anchor boxes with 3 different scales and 3 different aspect ratios.
+		For training RPN's we choose anchor box as positive only if it satisfies either of two scenario's 
+		1. Anchor box that has high IOU with the given Ground Truth
+		2. Anchor box that has IOU greater than 0.7 with ground truth.
+		3. We assign anchor to a negative label only if the IOU overlap is less than 0.3
+		Loss functions is multi-task loss function where one loss is log loss for classification as object or not object 
+		Second loss is Regression loss defined in Fast-RCNN paper.
+		4. Training an SGD with each minibatch coming from each input image with 256 anchor boxes in total with 128 positive and 128 negatives.
+		
+	
